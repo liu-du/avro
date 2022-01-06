@@ -76,6 +76,7 @@ public class TestReflectLogicalTypes {
         .items().stringType().noDefault().endRecord();
     expected.getField("uuids").schema().addProp(SpecificData.CLASS_PROP, List.class.getName());
     LogicalTypes.uuid().addToSchema(expected.getField("uuids").schema().getElementType());
+    expected.getField("uuids").schema().getElementType().addProp(SpecificData.CLASS_PROP, UUID.class.getName());
 
     Schema actual = REFLECT.getSchema(RecordWithUUIDList.class);
 

@@ -36,6 +36,8 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.apache.avro.specific.SpecificData.CLASS_PROP;
+
 public class TestTimeConversions {
 
   public static Schema DATE_SCHEMA;
@@ -47,12 +49,21 @@ public class TestTimeConversions {
   @BeforeClass
   public static void createSchemas() {
     TestTimeConversions.DATE_SCHEMA = LogicalTypes.date().addToSchema(Schema.create(Schema.Type.INT));
+    DATE_SCHEMA.addProp(CLASS_PROP, LocalDate.class.getName());
+
     TestTimeConversions.TIME_MILLIS_SCHEMA = LogicalTypes.timeMillis().addToSchema(Schema.create(Schema.Type.INT));
+    TIME_MILLIS_SCHEMA.addProp(CLASS_PROP, LocalTime.class.getName());
+
     TestTimeConversions.TIME_MICROS_SCHEMA = LogicalTypes.timeMicros().addToSchema(Schema.create(Schema.Type.LONG));
+    TIME_MICROS_SCHEMA.addProp(CLASS_PROP, LocalTime.class.getName());
+
     TestTimeConversions.TIMESTAMP_MILLIS_SCHEMA = LogicalTypes.timestampMillis()
         .addToSchema(Schema.create(Schema.Type.LONG));
+    TIMESTAMP_MILLIS_SCHEMA.addProp(CLASS_PROP, Instant.class.getName());
+
     TestTimeConversions.TIMESTAMP_MICROS_SCHEMA = LogicalTypes.timestampMicros()
         .addToSchema(Schema.create(Schema.Type.LONG));
+    TIMESTAMP_MICROS_SCHEMA.addProp(CLASS_PROP, Instant.class.getName());
   }
 
   @Test

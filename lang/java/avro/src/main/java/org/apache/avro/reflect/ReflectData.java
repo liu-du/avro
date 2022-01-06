@@ -693,7 +693,9 @@ public class ReflectData extends SpecificData {
         throw new AvroRuntimeException("Can't find element type of Collection");
       Conversion<?> conversion = getConversionByClass(c);
       if (conversion != null) {
-        return conversion.getRecommendedSchema();
+        Schema s = conversion.getRecommendedSchema();
+        s.addProp(SpecificData.CLASS_PROP, c.getName());
+        return s;
       }
       String fullName = c.getName();
       Schema schema = names.get(fullName);

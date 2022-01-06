@@ -254,6 +254,21 @@ public class ReflectDatumReader<T> extends SpecificDatumReader<T> {
   }
 
   @Override
+  protected Object read(Object old, Schema expected, ResolvingDecoder in) throws IOException {
+    Object datum = readWithoutConversion(old, expected, in);
+    LogicalType logicalType = expected.getLogicalType();
+    if (logicalType != null) {
+      Class<?> c = ReflectData.getClassProp(expected, SpecificData.CLASS_PROP);
+      Conversion<?> conversion = c == null ? getData().getConversionFor(logicalType)
+          : getData().getConversionByClass(c, logicalType);
+      if (conversion != null) {
+        return convert(datum, expected, logicalType, conversion);
+      }
+    }
+    return datum;
+  }
+
+  @Override
   protected void readField(Object record, Field field, Object oldDatum, ResolvingDecoder in, Object state)
       throws IOException {
     if (state != null) {
@@ -287,25 +302,6 @@ public class ReflectDatumReader<T> extends SpecificDatumReader<T> {
             }
             return;
           }
-        }
-
-        if (field.schema().isUnion()) {
-          Schema innerSchema = field.schema().getTypes().get(in.readIndex());
-          LogicalType innerLogicalType = innerSchema.getLogicalType();
-
-          Object value = readWithoutConversion(oldDatum, innerSchema, in);
-          if (innerLogicalType != null) {
-            Conversion<?> conversion = getData().getConversionByClass(accessor.getField().getType(), innerLogicalType);
-            if (conversion != null)
-              value = convert(value, innerSchema, innerLogicalType, conversion);
-          }
-
-          try {
-            accessor.set(record, value);
-          } catch (IllegalAccessException e) {
-            throw new AvroRuntimeException("Failed to set " + field);
-          }
-          return;
         }
 
         try {
